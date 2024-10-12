@@ -1,0 +1,34 @@
+{
+  "name": "logistics-dashboard",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint"
+  },
+  "dependencies": {
+    "@emotion/react": "^11.13.3",
+    "@emotion/styled": "^11.13.0",
+    "@mui/icons-material": "^6.1.3",
+    "@mui/material": "^6.1.3",
+    "@mui/x-date-pickers": "^7.20.0",
+    "@next/font": "^14.2.15",
+    "@prisma/client": "^5.20.0",
+    "@types/date-fns": "^2.6.0",
+    "date-fns": "^2.29.3",
+    "next": "14.2.15",
+    "prisma": "^5.20.0",
+    "react": "^18",
+    "react-dom": "^18"
+  },
+  "devDependencies": {
+    "@types/node": "^20",
+    "@types/react": "^18",
+    "@types/react-dom": "^18",
+    "eslint": "^8",
+    "eslint-config-next": "14.2.15",
+    "typescript": "^5"
+  }
+}

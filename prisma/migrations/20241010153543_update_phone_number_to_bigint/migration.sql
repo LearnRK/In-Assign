@@ -1,0 +1,2 @@
+-- AlterTable
+ALTER TABLE "Trip" ALTER COLUMN "phoneNumber" SET DATA TYPE BIGINT;
