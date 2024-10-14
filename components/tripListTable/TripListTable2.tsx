@@ -1,4 +1,4 @@
-"use client";
+"use client"
 
 import React, { useState, useEffect } from "react";
 import {
@@ -24,6 +24,8 @@ import TripStatusButton from "../buttons/TripStatusButton";
 import TATStatusButton from "../buttons/TATStatusButton";
 import AddTripDialog from "../addTrip/AddTrip";
 import UpdateTripDialog from "../addTrip/UpdateTrip";
+import { addTripToDatabase } from "@/app/actions/AddTrip";
+import { updateTripToDatabase } from "@/app/actions/UpdateTrip";
 
 interface Trip {
   id: string;
@@ -70,16 +72,15 @@ const TripListTable2: React.FC<TripListTableProps> = ({ trips }) => {
   const [selectAll, setSelectAll] = useState<boolean>(false);
   const [isAddDialogOpen, setIsAddDialogOpen] = useState<boolean>(false);
   const [isUpdateDialogOpen, setIsUpdateDialogOpen] = useState<boolean>(false);
-  const [selectedTrip, setSelectedTrip] = useState<Trip | null>(null);
   const [tripData, setTripData] = useState<Trip[]>(trips);
+  const [selectedTrips, setSelectedTrips] = useState<Trip[]>([]);
+  const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc');
+  const [sortColumn, setSortColumn] = useState<keyof Trip>('tripId');
 
   const totalRecords = tripData.length;
   const totalPages = Math.ceil(totalRecords / rowsPerPage);
 
-  const handleChangePage = (
-    event: React.ChangeEvent<unknown>,
-    newPage: number
-  ) => {
+  const handleChangePage = (event: React.ChangeEvent<unknown>, newPage: number) => {
     setPage(newPage);
   };
 
@@ -88,35 +89,33 @@ const TripListTable2: React.FC<TripListTableProps> = ({ trips }) => {
     setPage(1);
   };
 
-  const currentData = tripData.slice(
-    (page - 1) * rowsPerPage,
-    page * rowsPerPage
-  );
+  const currentData = tripData
+    .sort((a, b) => {
+      const order = sortDirection === 'asc' ? 1 : -1;
+      return a[sortColumn] > b[sortColumn] ? order : -order;
+    })
+    .slice((page - 1) * rowsPerPage, page * rowsPerPage);
 
   const handleRowSelect = (tripId: string) => {
-    if (selectedRows.includes(tripId)) {
-      setSelectedRows(selectedRows.filter((id) => id !== tripId));
-    } else {
-      setSelectedRows([...selectedRows, tripId]);
-    }
+    setSelectedRows((prevSelected) => 
+      prevSelected.includes(tripId) 
+        ? prevSelected.filter((id) => id !== tripId) 
+        : [...prevSelected, tripId]
+    );
   };
 
   const handleSelectAll = () => {
-    if (selectAll) {
-      setSelectedRows([]);
-    } else {
+    setSelectAll((prev) => !prev);
+    if (!selectAll) {
       setSelectedRows(currentData.map((trip) => trip.tripId));
+    } else {
+      setSelectedRows([]);
     }
-    setSelectAll(!selectAll);
   };
 
   useEffect(() => {
-    if (selectedRows.length === currentData.length && currentData.length > 0) {
-      setSelectAll(true);
-    } else {
-      setSelectAll(false);
-    }
-  }, [selectedRows, currentData]);
+    setSelectedTrips(tripData.filter((trip) => selectedRows.includes(trip.tripId)));
+  }, [selectedRows, tripData]);
 
   const TAT = (trip: Trip): string => {
     const { etaDays, tripStartTime, tripEndTime, lastPingTime } = trip;
@@ -128,26 +127,20 @@ const TripListTable2: React.FC<TripListTableProps> = ({ trips }) => {
     let actualTripTime: number | undefined;
 
     if (tripEndTime) {
-      actualTripTime =
-        new Date(tripEndTime).getTime() - new Date(tripStartTime).getTime();
+      actualTripTime = new Date(tripEndTime).getTime() - new Date(tripStartTime).getTime();
     } else if (lastPingTime) {
-      actualTripTime =
-        new Date(lastPingTime).getTime() - new Date(tripStartTime).getTime();
+      actualTripTime = new Date(lastPingTime).getTime() - new Date(tripStartTime).getTime();
     } else {
       return "Other";
     }
 
     const actualTripDays = actualTripTime / (1000 * 60 * 60 * 24);
 
-    if (etaDays >= actualTripDays) {
-      return "On Time";
-    } else {
-      return "Delayed";
-    }
+    return etaDays >= actualTripDays ? "On Time" : "Delayed";
   };
 
   // Handle Add Trip
-  const handleAddTrip = (formState: TripForm) => {
+  const handleAddTrip = async (formState: TripForm) => {
     const newTrip: Trip = {
       id: crypto.randomUUID(),
       tripId: formState.tripId,
@@ -171,27 +164,61 @@ const TripListTable2: React.FC<TripListTableProps> = ({ trips }) => {
 
     setTripData((prevTrips) => [...prevTrips, newTrip]);
     setIsAddDialogOpen(false);
+
+    try {
+      console.log("trying addTripToDatabase call ")
+      const temp = await addTripToDatabase(newTrip);
+      console.log("result of addTripToDatabase"      )
+    } catch (error) {
+      console.error("Failed to add trip to database:", error);
+    }
   };
 
-  // Handle Update Trip
-  const handleUpdateTrip = (formState: UpdateTripForm) => {
-    const updatedTrips = tripData.map((trip) =>
-      trip.tripId === selectedTrip?.tripId
-        ? {
-            ...trip,
-            transporter: formState.transporter,
-            tripStartTime: formState.time?.toISOString() || "",
-          }
-        : trip
-    );
-    setTripData(updatedTrips);
-    setIsUpdateDialogOpen(false);
-    setSelectedTrip(null);
-  };
+  const handleUpdateTrip = async (formState: UpdateTripForm[]) => {
+    try {
+        // Iterate through the selected trips and update each one in the database
+        for (let index = 0; index < selectedTrips.length; index++) {
+            const trip = selectedTrips[index];
+            const updatedData = formState[index];
 
-  const openUpdateDialog = (trip: Trip) => {
-    setSelectedTrip(trip);
+            // Call the updateTripToDatabase action to update the database
+            await updateTripToDatabase(trip.tripId, {
+                transporter: updatedData.transporter,
+                tripStartTime: updatedData.time?.toISOString(),
+            });
+        }
+
+        // Update the frontend state after successfully updating the database
+        const updatedTrips = tripData.map((trip, index) =>
+            selectedRows.includes(trip.tripId)
+                ? {
+                    ...trip,
+                    transporter: formState[index].transporter,
+                    tripStartTime: formState[index].time?.toISOString() || trip.tripStartTime,
+                }
+                : trip
+        );
+
+        setTripData(updatedTrips);
+        setIsUpdateDialogOpen(false);
+        setSelectedTrips([]);
+    } catch (error) {
+        console.error("Failed to update trip in the database:", error);
+    }
+};
+
+
+  const openUpdateDialog = () => {
     setIsUpdateDialogOpen(true);
+  };
+
+  const handleColumnClick = (column: keyof Trip) => {
+    if (sortColumn === column) {
+      setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc');
+    } else {
+      setSortColumn(column);
+      setSortDirection('asc');
+    }
   };
 
   return (
@@ -239,7 +266,7 @@ const TripListTable2: React.FC<TripListTableProps> = ({ trips }) => {
         </Typography>
 
         <Box sx={{ display: "flex", gap: "8px" }}>
-          {selectedRows.length === 1 && (
+          {selectedRows.length >= 1 && (
             <Button
               variant="outlined"
               sx={{
@@ -256,11 +283,7 @@ const TripListTable2: React.FC<TripListTableProps> = ({ trips }) => {
                 textTransform: "none",
                 padding: "8px",
               }}
-              onClick={() =>
-                openUpdateDialog(
-                  tripData.find((trip) => trip.tripId === selectedRows[0])!
-                )
-              }
+              onClick={openUpdateDialog}
             >
               Update status
             </Button>
@@ -272,7 +295,7 @@ const TripListTable2: React.FC<TripListTableProps> = ({ trips }) => {
               height: "32px",
               background: "#0057D1",
               borderRadius: "4px",
-              fontFamily: "'Poppins', sans-serif",
+              fontFamily: "Poppins, sans-serif",
               fontWeight: 500,
               fontSize: "11px",
               lineHeight: "16px",
@@ -304,13 +327,13 @@ const TripListTable2: React.FC<TripListTableProps> = ({ trips }) => {
                   onChange={handleSelectAll}
                 />
               </TableCell>
-              <TableCell>Trip id</TableCell>
-              <TableCell>Transporter</TableCell>
-              <TableCell>Source</TableCell>
-              <TableCell>Destination</TableCell>
-              <TableCell>Phone</TableCell>
-              <TableCell>ETA</TableCell>
-              <TableCell>Distance remaining</TableCell>
+              <TableCell onClick={() => handleColumnClick('tripId')} sx={{ cursor: 'pointer' }}>Trip id</TableCell>
+              <TableCell onClick={() => handleColumnClick('transporter')} sx={{ cursor: 'pointer' }}>Transporter</TableCell>
+              <TableCell onClick={() => handleColumnClick('source')} sx={{ cursor: 'pointer' }}>Source</TableCell>
+              <TableCell onClick={() => handleColumnClick('dest')} sx={{ cursor: 'pointer' }}>Destination</TableCell>
+              <TableCell onClick={() => handleColumnClick('phoneNumber')} sx={{ cursor: 'pointer' }}>Phone</TableCell>
+              <TableCell onClick={() => handleColumnClick('etaDays')} sx={{ cursor: 'pointer' }}>ETA</TableCell>
+              <TableCell onClick={() => handleColumnClick('distanceRemaining')} sx={{ cursor: 'pointer' }}>Distance remaining</TableCell>
               <TableCell>Trip status</TableCell>
               <TableCell>TAT status</TableCell>
             </TableRow>
@@ -330,11 +353,51 @@ const TripListTable2: React.FC<TripListTableProps> = ({ trips }) => {
                     onChange={() => handleRowSelect(row.tripId)}
                   />
                 </TableCell>
-                <TableCell sx={{ whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{row.tripId}</TableCell>
-                <TableCell sx={{ whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{row.transporter}</TableCell>
-                <TableCell sx={{ whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{row.source}</TableCell>
-                <TableCell sx={{ whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{row.dest}</TableCell>
-                <TableCell sx={{ whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{row.phoneNumber}</TableCell>
+                <TableCell
+                  sx={{
+                    whiteSpace: "nowrap",
+                    overflow: "hidden",
+                    textOverflow: "ellipsis",
+                  }}
+                >
+                  {row.tripId}
+                </TableCell>
+                <TableCell
+                  sx={{
+                    whiteSpace: "nowrap",
+                    overflow: "hidden",
+                    textOverflow: "ellipsis",
+                  }}
+                >
+                  {row.transporter}
+                </TableCell>
+                <TableCell
+                  sx={{
+                    whiteSpace: "nowrap",
+                    overflow: "hidden",
+                    textOverflow: "ellipsis",
+                  }}
+                >
+                  {row.source}
+                </TableCell>
+                <TableCell
+                  sx={{
+                    whiteSpace: "nowrap",
+                    overflow: "hidden",
+                    textOverflow: "ellipsis",
+                  }}
+                >
+                  {row.dest}
+                </TableCell>
+                <TableCell
+                  sx={{
+                    whiteSpace: "nowrap",
+                    overflow: "hidden",
+                    textOverflow: "ellipsis",
+                  }}
+                >
+                  {row.phoneNumber}
+                </TableCell>
                 <TableCell>{row.etaDays}</TableCell>
                 <TableCell>{row.distanceRemaining}</TableCell>
                 <TableCell>
@@ -413,12 +476,12 @@ const TripListTable2: React.FC<TripListTableProps> = ({ trips }) => {
         onSubmit={handleAddTrip}
       />
 
-      {selectedTrip && (
+      {selectedTrips.length > 0 && (
         <UpdateTripDialog
           open={isUpdateDialogOpen}
           onClose={() => setIsUpdateDialogOpen(false)}
           onSubmit={handleUpdateTrip}
-          trip={selectedTrip}  // Pass the selected trip to the dialog
+          trips={selectedTrips}
         />
       )}
     </Paper>

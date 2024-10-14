@@ -9,7 +9,7 @@ generator client {
 
 model Trip {
   id                String @id @default(uuid())
-  tripId            String
+  tripId            String @unique
   transporter       String
   tripStartTime     String
   currentStatusCode String

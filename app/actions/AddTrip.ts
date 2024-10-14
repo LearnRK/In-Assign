@@ -1,3 +1,5 @@
+"use server"
+
 import prisma from "@/lib/prisma"; // Adjust the path as necessary
 
 export const addTripToDatabase = async (tripData: {

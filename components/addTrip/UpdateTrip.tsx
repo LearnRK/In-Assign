@@ -4,8 +4,6 @@ import {
   DialogTitle,
   DialogContent,
   DialogActions,
-  Select,
-  MenuItem,
   Button,
   FormControl,
   Typography,
@@ -13,7 +11,6 @@ import {
   TextField,
 } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
-import { SelectChangeEvent } from '@mui/material';
 import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
 import { LocalizationProvider } from '@mui/x-date-pickers';
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
@@ -32,8 +29,8 @@ interface Trip {
 interface UpdateTripDialogProps {
   open: boolean;
   onClose: () => void;
-  onSubmit: (formState: UpdateTripForm[], tripIds: string[]) => void;
-  trips: Trip[]; // Accept trips as an array
+  onSubmit: (formState: UpdateTripForm[]) => void;  // Accepts an array of UpdateTripForm
+  trips: Trip[];
 }
 
 const UpdateTripDialog: React.FC<UpdateTripDialogProps> = ({
@@ -42,25 +39,20 @@ const UpdateTripDialog: React.FC<UpdateTripDialogProps> = ({
   onSubmit,
   trips,
 }) => {
-  const [formState, setFormState] = useState<UpdateTripForm[]>(() =>
-    trips.map((trip) => ({
-      transporter: trip.transporter || '',
-      time: trip.tripStartTime ? new Date(trip.tripStartTime) : null,
-    }))
-  );
-
-  const [isFormValid, setIsFormValid] = useState<boolean>(false);
+  const [formState, setFormState] = useState<UpdateTripForm[]>([]);
 
   useEffect(() => {
-    if (trips) {
-      setFormState(() =>
-        trips.map((trip) => ({
-          transporter: trip.transporter || '',
-          time: trip.tripStartTime ? new Date(trip.tripStartTime) : null,
-        }))
-      );
+    if (trips.length > 0) {
+      const initialFormState = trips.map((trip) => ({
+        transporter: trip.transporter || '',
+        time: trip.tripStartTime ? new Date(trip.tripStartTime) : null,
+      }));
+
+      setFormState(initialFormState); // Only set form state when trips change
     }
-  }, [trips]);
+  }, [trips]); // Dependency array should contain `trips`
+
+  const [isFormValid, setIsFormValid] = useState<boolean>(false);
 
   useEffect(() => {
     const isValid = formState.every(
@@ -86,10 +78,9 @@ const UpdateTripDialog: React.FC<UpdateTripDialogProps> = ({
     });
   };
 
-  const handleSubmit = () => {
-    const tripIds = trips.map((trip) => trip.tripId);
-    onSubmit(formState, tripIds); // Pass the updated state and trip IDs
-    onClose();
+  const handleSubmit = async () => {
+    onSubmit(formState);  // Pass the form state to the parent component
+    onClose();  // Close the dialog after submission
   };
 
   return (
@@ -148,7 +139,7 @@ const UpdateTripDialog: React.FC<UpdateTripDialogProps> = ({
               </Typography>
               <input
                 name={`transporter_${index}`}
-                value={formState[index].transporter}
+                value={formState[index]?.transporter || ''}  // Ensure formState exists
                 onChange={(e) => handleTextFieldChange(index, e)}
                 placeholder="Enter Transporter"
                 style={{
@@ -178,28 +169,19 @@ const UpdateTripDialog: React.FC<UpdateTripDialogProps> = ({
                 Time for {trip.tripId}
               </Typography>
               <LocalizationProvider dateAdapter={AdapterDateFns}>
-                <DateTimePicker
-                  value={formState[index].time}
-                  onChange={(newDate) => handleDateChange(index, newDate)}
-                  slots={{
-                    textField: TextField,
-                  }}
-                  slotProps={{
-                    textField: {
-                      fullWidth: true,
-                      sx: {
-                        height: '32px',
-                        borderRadius: '4px',
-                        border: '1px solid #E0E0E0',
-                        '& .MuiInputBase-input': {
-                          fontFamily: 'Source Sans Pro, sans-serif',
-                          fontSize: '12px',
-                          padding: '8px 12px',
-                        },
-                      },
-                    },
-                  }}
-                />
+              <DateTimePicker
+                value={formState[index]?.time || null}
+                onChange={(newDate) => handleDateChange(index, newDate)}
+                slots={{
+                  textField: TextField,  // Use TextField as the input slot
+                }}
+                slotProps={{
+                  textField: {
+                    fullWidth: true,  // Spread fullWidth property here
+                  },
+                }}
+              />
+
               </LocalizationProvider>
             </FormControl>
           </div>

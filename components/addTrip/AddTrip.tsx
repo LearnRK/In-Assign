@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from 'react';
+
+import React, { useState, useEffect } from "react";
 import {
   Dialog,
   DialogTitle,
@@ -11,28 +12,28 @@ import {
   Typography,
   Box,
   IconButton,
-} from '@mui/material';
-import CloseIcon from '@mui/icons-material/Close';
-import { SelectChangeEvent } from '@mui/material';
+} from "@mui/material";
+import CloseIcon from "@mui/icons-material/Close";
+import { SelectChangeEvent } from "@mui/material";
+import prisma from "@/lib/prisma"; // Adjust the path to your Prisma client
 
-// InputBox component for reusability
 const InputBox: React.FC<{
   label: string;
   value: string;
   name: string;
   placeholder: string;
   onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
-  width?: string; // Optional width prop
+  width?: string;
 }> = ({ label, value, name, placeholder, onChange, width = "100%" }) => (
   <FormControl fullWidth margin="dense">
     <Typography
       component="label"
       sx={{
         fontWeight: 500,
-        fontSize: '12px',
-        lineHeight: '16px',
-        color: '#1A1A1A',
-        marginBottom: '2px',
+        fontSize: "12px",
+        lineHeight: "16px",
+        color: "#1A1A1A",
+        marginBottom: "2px",
       }}
     >
       {label}
@@ -43,21 +44,20 @@ const InputBox: React.FC<{
       onChange={onChange}
       placeholder={placeholder}
       style={{
-        width: width, // Directly pass the width value
-        height: '32px',
-        fontFamily: 'Source Sans Pro, sans-serif',
-        fontSize: '12px',
-        lineHeight: '16px',
-        color: '#666666',
-        padding: '8px 12px',
-        backgroundColor: '#FFFFFF',
-        border: '1px solid #E0E0E0',
-        borderRadius: '4px',
+        width: width,
+        height: "32px",
+        fontFamily: "Source Sans Pro, sans-serif",
+        fontSize: "12px",
+        lineHeight: "16px",
+        color: "#666666",
+        padding: "8px 12px",
+        backgroundColor: "#FFFFFF",
+        border: "1px solid #E0E0E0",
+        borderRadius: "4px",
       }}
     />
   </FormControl>
 );
-
 
 interface TripForm {
   tripId: string;
@@ -70,7 +70,7 @@ interface TripForm {
 interface AddTripDialogProps {
   open: boolean;
   onClose: () => void;
-  onSubmit: (formState: TripForm) => void;
+  onSubmit: (formState: TripForm) => Promise<void>; // Change to return Promise
 }
 
 const AddTripDialog: React.FC<AddTripDialogProps> = ({ open, onClose, onSubmit }) => {
@@ -86,7 +86,7 @@ const AddTripDialog: React.FC<AddTripDialogProps> = ({ open, onClose, onSubmit }
 
   useEffect(() => {
     const { tripId, transporter, source, destination, phone } = formState;
-    setIsFormValid(tripId && transporter && source && destination && phone ? true : false);
+    setIsFormValid(!!(tripId && transporter && source && destination && phone));
   }, [formState]);
 
   const handleTextFieldChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -99,8 +99,8 @@ const AddTripDialog: React.FC<AddTripDialogProps> = ({ open, onClose, onSubmit }
     setFormState((prevState) => ({ ...prevState, [name]: value }));
   };
 
-  const handleSubmit = () => {
-    onSubmit(formState);
+  const handleSubmit = async () => {
+    await onSubmit(formState); // Ensure this is awaited
     onClose();
   };
 
@@ -152,13 +152,12 @@ const AddTripDialog: React.FC<AddTripDialogProps> = ({ open, onClose, onSubmit }
             marginBottom: '8px',
           }}
         >
-          {/* Using InputBox component for Trip id */}
           <InputBox
-            label="Trip id"
+            label="Trip ID"
             value={formState.tripId}
             name="tripId"
             onChange={handleTextFieldChange}
-            placeholder="Enter Trip ID" // Placeholder added
+            placeholder="Enter Trip ID"
           />
 
           <FormControl fullWidth margin="dense">
@@ -190,7 +189,7 @@ const AddTripDialog: React.FC<AddTripDialogProps> = ({ open, onClose, onSubmit }
               <MenuItem value="">
                 <em>Select Option</em>
               </MenuItem>
-              <MenuItem value="Blue dart">Blue dart</MenuItem>
+              <MenuItem value="Blue Dart">Blue Dart</MenuItem>
               <MenuItem value="DHL">DHL</MenuItem>
               <MenuItem value="Delhivery">Delhivery</MenuItem>
               <MenuItem value="DTDC">DTDC</MenuItem>
@@ -208,33 +207,29 @@ const AddTripDialog: React.FC<AddTripDialogProps> = ({ open, onClose, onSubmit }
             marginBottom: '8px',
           }}
         >
-          {/* Using InputBox component for Source and Destination */}
           <InputBox
             label="Source"
             value={formState.source}
             name="source"
             onChange={handleTextFieldChange}
-            placeholder="Enter Source" // Placeholder added
+            placeholder="Enter Source"
           />
-
           <InputBox
             label="Destination"
             value={formState.destination}
             name="destination"
             onChange={handleTextFieldChange}
-            placeholder="Enter Destination" // Placeholder added
+            placeholder="Enter Destination"
           />
         </Box>
 
-        {/* Phone Field */}
         <InputBox
           label="Phone"
           value={formState.phone}
           name="phone"
           onChange={handleTextFieldChange}
-          placeholder="Enter Phone Number" // Placeholder added
-          width= {`calc(50% - 20px)`}
-          />
+          placeholder="Enter Phone Number"
+        />
       </DialogContent>
 
       <DialogActions
