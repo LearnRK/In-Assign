@@ -1,6 +1,6 @@
 // app/api/createTrip/route.ts
 import { NextResponse } from 'next/server';
-import client from '@/db/index';
+import client from '@/extra/db/index';
 
 export async function POST(req: Request) {
     try {

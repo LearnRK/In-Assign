@@ -15,7 +15,6 @@ import {
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
 import { SelectChangeEvent } from "@mui/material";
-import prisma from "@/lib/prisma"; // Adjust the path to your Prisma client
 
 const InputBox: React.FC<{
   label: string;

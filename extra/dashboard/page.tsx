@@ -1,7 +1,7 @@
 import React from 'react';
 import { Box } from '@mui/material';
 import TripListTable from '@/extra/extra/TripListTable';
-import StatusNavBar from '@/components/statusNavbar/StatusNavbar';
+import StatusNavBar from '@/extra/statusNavbar/StatusNavbar';
 import { fetchTripsFromDB, Trip } from '@/extra/extra/GetData'; // Import your function
 
 const Dashboard = async () => {

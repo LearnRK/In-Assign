@@ -1,6 +1,6 @@
 "use server";
 
-import client from "@/db/index";
+import client from "@/extra/db/index";
 
 export interface Trip {
     id: string;

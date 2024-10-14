@@ -4,8 +4,8 @@ import React, { useEffect, useState, useContext } from 'react';
 import { Box } from '@mui/material';
 import TripListTable2 from '@/components/tripListTable/TripListTable2';
 import Header from '@/components/header/header';
-import StatusCard from '@/components/statusNavbar/StatusCard';
-import { AuthContext } from '@/context/AuthContext'; // Import AuthContext
+import StatusCard from '@/components/statusCard/StatusCard';
+import { AuthContext } from '@/extra/context/AuthContext'; // Import AuthContext
 import { fetchTripsFromDB, Trip } from '@/extra/extra/GetData';
 
 const Dashboard = () => {

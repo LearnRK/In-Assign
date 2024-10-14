@@ -1,5 +1,5 @@
 "use server"
-import prisma from "@/lib/prisma";
+import prisma from "@/lib/23/prisma";
 
 export const addTripToDatabase = async (tripData: {
     tripId: string;

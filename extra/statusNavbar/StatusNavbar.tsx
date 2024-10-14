@@ -1,7 +1,7 @@
 import React from 'react';
 import { Grid, Box } from '@mui/material';
 import DeliveredStatCard2 from './DeliveredStatCard2';
-import TotalTripsStatCard2 from './TotalTripsStatCard2';
+// import TotalTripsStatCard2 from '../../../components/statusNavbar/TotalTripsStatCard2';
 import StatusStatCard2 from './StatusStatCard2';
 
 const StatusNavBar: React.FC = () => {
@@ -34,7 +34,7 @@ const StatusNavBar: React.FC = () => {
                             height: '100%',
                         }}
                     >
-                        <TotalTripsStatCard2 title="Total trips" value="18,033" />
+                        {/* <TotalTripsStatCard2 title="Total trips" value="18,033" /> */}
                     </Box>
                 </Grid>
 
