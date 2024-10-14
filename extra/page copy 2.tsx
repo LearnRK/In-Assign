@@ -1,45 +1,43 @@
-// app/dashboard/page.tsx
 "use client"; // Mark this component as a client component
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useContext } from 'react';
 import { Box } from '@mui/material';
 import TripListTable2 from '@/components/tripListTable/TripListTable2';
 import Header from '@/components/header/header';
 import StatusCard from '@/components/statusNavbar/StatusCard';
-import keycloak from '@/keycloak/keycloak'; // Import your Keycloak instance
-import { fetchTripsFromDB, Trip } from '@/components/tripListTable/GetData';
+import { AuthContext } from '@/context/AuthContext'; // Import AuthContext
+import { fetchTripsFromDB, Trip } from '@/extra/extra/GetData';
 
 const Dashboard = () => {
+  const context = useContext(AuthContext); // Retrieve context
+  const authenticated = context?.authenticated || false; // Provide a default
+  const keycloak = context?.keycloak || null; // Provide a default
+
   const [trips, setTrips] = useState<Trip[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const checkAuth = async () => {
-      try {
-        const authenticated = await keycloak.init({
-          onLoad: 'login-required',
-          checkLoginIframe: false,
-          pkceMethod: 'S256', // Use PKCE method for added security
-          flow: 'standard', // Use standard flow for confidential clients
-        });
-
-        if (!authenticated) {
-          window.location.reload(); // Reload if not authenticated
+      if (keycloak) {
+        if (authenticated) {
+          try {
+            const tripsData: Trip[] = await fetchTripsFromDB();
+            setTrips(tripsData);
+          } catch (error) {
+            console.error('Error fetching trips:', error);
+          } finally {
+            setLoading(false);
+          }
         } else {
-          const tripsData: Trip[] = await fetchTripsFromDB(); // Fetch trips if authenticated
-          setTrips(tripsData);
+          await keycloak.login(); // Redirect to Keycloak login if not authenticated
         }
-      } catch (error) {
-        console.error('Keycloak authentication failed:', error);
-        // Redirect to login page if Keycloak initialization fails
-        keycloak.login();
-      } finally {
-        setLoading(false);
+      } else {
+        console.error('Keycloak instance is not available.'); // Log an error if keycloak is not available
       }
     };
 
-    checkAuth();
-  }, []);
+    checkAuth(); // Call the function to check authentication
+  }, [authenticated, keycloak]);
 
   if (loading) {
     return <div>Loading...</div>; // Show loading state while checking authentication
@@ -72,6 +70,11 @@ const Dashboard = () => {
 };
 
 export default Dashboard;
+
+
+
+
+
 
 
 

@@ -20,8 +20,8 @@ import {
   SelectChangeEvent,
 } from "@mui/material";
 import { ArrowBackIos, ArrowForwardIos } from "@mui/icons-material";
-import TripStatusButton from "../../buttons/TripStatusButton";
-import TATStatusButton from "../../buttons/TATStatusButton";
+import TripStatusButton from "../../components/buttons/TripStatusButton";
+import TATStatusButton from "../../components/buttons/TATStatusButton";
 
 interface Trip {
   id: string;

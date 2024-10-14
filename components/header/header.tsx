@@ -1,5 +1,3 @@
-// Header.tsx
-
 import React from 'react';
 import { AppBar, Toolbar, Typography, Button, Box } from '@mui/material';
 import Image from 'next/image'; // Assuming you're using Next.js Image component for the logo
@@ -10,18 +8,15 @@ const Header: React.FC = () => {
             <Toolbar>
                 <Box sx={{ flexGrow: 1, display: 'flex', alignItems: 'center' }}>
                     <Image
-                        src="/path_to_logo.png" // Replace with your logo path
+                        src="/logo.svg" // Correct path to the logo located in the public directory
                         alt="logoipsum"
-                        width={40} // Adjust the size as needed
+                        width={120} // Adjust the size as needed
                         height={40}
                     />
-                    <Typography variant="h6" sx={{ marginLeft: 1, color: '#fff' }}>
-                        LogoIpsum
-                    </Typography>
                 </Box>
-                <Button variant="contained" sx={{ backgroundColor: '#fff', color: '#000', textTransform: 'none' }}>
+                {/* <Button variant="contained" sx={{ backgroundColor: '#fff', color: '#000', textTransform: 'none' }}>
                     Action
-                </Button>
+                </Button> */}
             </Toolbar>
         </AppBar>
     );

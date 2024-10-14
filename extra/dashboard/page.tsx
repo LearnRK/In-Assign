@@ -1,8 +1,8 @@
 import React from 'react';
 import { Box } from '@mui/material';
-import TripListTable from '@/components/tripListTable/extra/TripListTable';
+import TripListTable from '@/extra/extra/TripListTable';
 import StatusNavBar from '@/components/statusNavbar/StatusNavbar';
-import { fetchTripsFromDB, Trip } from '@/components/tripListTable/GetData'; // Import your function
+import { fetchTripsFromDB, Trip } from '@/extra/extra/GetData'; // Import your function
 
 const Dashboard = async () => {
     // Fetching trips data directly in the Server Component

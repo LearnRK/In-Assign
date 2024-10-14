@@ -177,7 +177,7 @@
 
 import React from 'react';
 import { Box } from '@mui/material';
-import { Trip } from '@/components/tripListTable/GetData';
+import { Trip } from '@/extra/extra/GetData';
 import Header from '@/components/header/header';
 import StatusCard from '@/components/statusNavbar/StatusCard';
 import TripListTable2 from '@/components/tripListTable/TripListTable2';
@@ -193,6 +193,7 @@ const Dashboard = async () => {
         height: '100vh', // Full screen height
         display: 'flex',
         flexDirection: 'column',
+        marginBottom: "24px"
       }}
     >
       {/* Header should take a fixed height */}
@@ -207,7 +208,8 @@ const Dashboard = async () => {
       </Box>
 
       {/* Table component grows to fill the remaining space */}
-      <Box sx={{ flexGrow: 1, overflow: 'hidden' }}>
+      <Box sx={{ flexGrow: 1, overflow: 'hidden', border: '1px solid #E0E0E0', borderRadius: '8px', marginRight: "24px", marginLeft: "24px",  
+}}>
         <TripListTable2 trips={trips} />
       </Box>
     </Box>

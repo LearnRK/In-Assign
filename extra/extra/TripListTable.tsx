@@ -2,7 +2,7 @@
 
 import React, { useState } from "react";
 import { Paper, Table, TableBody, TableContainer, TableHead, Box } from "@mui/material";
-import { Trip } from "../GetData";
+import { Trip } from "./GetData";
 import TableHeader from "./TableHeader";
 import ColumnName from "./ColumnName";
 import TableRows from "./TableRows";

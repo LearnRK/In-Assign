@@ -229,15 +229,9 @@ const TripListTable2: React.FC<TripListTableProps> = ({ trips }) => {
         display: "flex",
         flexDirection: "column",
         alignItems: "flex-start",
-        padding: "16px 24px",
-        width: "calc(100% - 48px)",
+        width: "calc(100%)",
         height: "calc(100vh - 48px)",
-        border: "1px solid #E0E0E0",
-        borderRadius: "8px",
         backgroundColor: "#FFFFFF",
-        marginLeft: "24px",
-        marginRight: "24px",
-        marginBottom: "24px",
         overflow: "hidden",
       }}
     >
@@ -318,97 +312,156 @@ const TripListTable2: React.FC<TripListTableProps> = ({ trips }) => {
         }}
       >
         <Table stickyHeader sx={{ tableLayout: "fixed", width: "100%" }}>
-          <TableHead>
-            <TableRow sx={{ backgroundColor: "#F1F3F4" }}>
-              <TableCell padding="checkbox" sx={{ minWidth: 40 }}>
-                <Checkbox
-                  color="primary"
-                  checked={selectAll}
-                  onChange={handleSelectAll}
-                />
-              </TableCell>
-              <TableCell onClick={() => handleColumnClick('tripId')} sx={{ cursor: 'pointer' }}>Trip id</TableCell>
-              <TableCell onClick={() => handleColumnClick('transporter')} sx={{ cursor: 'pointer' }}>Transporter</TableCell>
-              <TableCell onClick={() => handleColumnClick('source')} sx={{ cursor: 'pointer' }}>Source</TableCell>
-              <TableCell onClick={() => handleColumnClick('dest')} sx={{ cursor: 'pointer' }}>Destination</TableCell>
-              <TableCell onClick={() => handleColumnClick('phoneNumber')} sx={{ cursor: 'pointer' }}>Phone</TableCell>
-              <TableCell onClick={() => handleColumnClick('etaDays')} sx={{ cursor: 'pointer' }}>ETA</TableCell>
-              <TableCell onClick={() => handleColumnClick('distanceRemaining')} sx={{ cursor: 'pointer' }}>Distance remaining</TableCell>
-              <TableCell>Trip status</TableCell>
-              <TableCell>TAT status</TableCell>
-            </TableRow>
-          </TableHead>
+        <TableHead>
+  <TableRow sx={{ backgroundColor: "#F1F3F4" }}>
+    <TableCell padding="checkbox" sx={{ minWidth: 40 }}>
+      <Checkbox
+        color="primary"
+        checked={selectAll}
+        onChange={handleSelectAll}
+      />
+    </TableCell>
+    <TableCell
+      onClick={() => handleColumnClick('tripId')}
+      sx={{
+        cursor: 'pointer',
+        fontWeight: 'bold', // Makes the column header bold
+      }}
+    >
+      Trip id
+    </TableCell>
+    <TableCell
+      onClick={() => handleColumnClick('transporter')}
+      sx={{
+        cursor: 'pointer',
+        fontWeight: 'bold', // Makes the column header bold
+      }}
+    >
+      Transporter
+    </TableCell>
+    <TableCell
+      onClick={() => handleColumnClick('source')}
+      sx={{
+        cursor: 'pointer',
+        fontWeight: 'bold', // Makes the column header bold
+      }}
+    >
+      Source
+    </TableCell>
+    <TableCell
+      onClick={() => handleColumnClick('dest')}
+      sx={{
+        cursor: 'pointer',
+        fontWeight: 'bold', // Makes the column header bold
+      }}
+    >
+      Destination
+    </TableCell>
+    <TableCell
+      onClick={() => handleColumnClick('phoneNumber')}
+      sx={{
+        cursor: 'pointer',
+        fontWeight: 'bold', // Makes the column header bold
+      }}
+    >
+      Phone
+    </TableCell>
+    <TableCell
+      onClick={() => handleColumnClick('etaDays')}
+      sx={{
+        cursor: 'pointer',
+        fontWeight: 'bold', // Makes the column header bold
+      }}
+    >
+      ETA
+    </TableCell>
+    <TableCell
+      onClick={() => handleColumnClick('distanceRemaining')}
+      sx={{
+        cursor: 'pointer',
+        fontWeight: 'bold', // Makes the column header bold
+      }}
+    >
+      Distance remaining
+    </TableCell>
+    <TableCell sx={{ fontWeight: 'bold' }}>Trip status</TableCell>
+    <TableCell sx={{ fontWeight: 'bold' }}>TAT status</TableCell>
+  </TableRow>
+</TableHead>
 
-          <TableBody>
-            {currentData.map((row) => (
-              <TableRow
-                hover
-                sx={{ height: "40px", padding: "0 20px", gap: "16px" }}
-                key={row.tripId}
-              >
-                <TableCell padding="checkbox">
-                  <Checkbox
-                    color="primary"
-                    checked={selectedRows.includes(row.tripId)}
-                    onChange={() => handleRowSelect(row.tripId)}
-                  />
-                </TableCell>
-                <TableCell
-                  sx={{
-                    whiteSpace: "nowrap",
-                    overflow: "hidden",
-                    textOverflow: "ellipsis",
-                  }}
-                >
-                  {row.tripId}
-                </TableCell>
-                <TableCell
-                  sx={{
-                    whiteSpace: "nowrap",
-                    overflow: "hidden",
-                    textOverflow: "ellipsis",
-                  }}
-                >
-                  {row.transporter}
-                </TableCell>
-                <TableCell
-                  sx={{
-                    whiteSpace: "nowrap",
-                    overflow: "hidden",
-                    textOverflow: "ellipsis",
-                  }}
-                >
-                  {row.source}
-                </TableCell>
-                <TableCell
-                  sx={{
-                    whiteSpace: "nowrap",
-                    overflow: "hidden",
-                    textOverflow: "ellipsis",
-                  }}
-                >
-                  {row.dest}
-                </TableCell>
-                <TableCell
-                  sx={{
-                    whiteSpace: "nowrap",
-                    overflow: "hidden",
-                    textOverflow: "ellipsis",
-                  }}
-                >
-                  {row.phoneNumber}
-                </TableCell>
-                <TableCell>{row.etaDays}</TableCell>
-                <TableCell>{row.distanceRemaining}</TableCell>
-                <TableCell>
-                  <TripStatusButton type={row.currenStatus} />
-                </TableCell>
-                <TableCell>
-                  <TATStatusButton type={TAT(row)} />
-                </TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
+
+<TableBody>
+  {currentData.map((row) => (
+    <TableRow
+      hover
+      sx={{ height: "40px", padding: "0 20px", gap: "16px" }}
+      key={row.tripId}
+    >
+      <TableCell padding="checkbox">
+        <Checkbox
+          color="primary"
+          checked={selectedRows.includes(row.tripId)}
+          onChange={() => handleRowSelect(row.tripId)}
+        />
+      </TableCell>
+      <TableCell
+        sx={{
+          whiteSpace: "nowrap",
+          overflow: "hidden",
+          textOverflow: "ellipsis",
+          fontWeight: 'bold', // Makes the Trip id bold in the body
+        }}
+      >
+        {row.tripId}
+      </TableCell>
+      <TableCell
+        sx={{
+          whiteSpace: "nowrap",
+          overflow: "hidden",
+          textOverflow: "ellipsis",
+        }}
+      >
+        {row.transporter}
+      </TableCell>
+      <TableCell
+        sx={{
+          whiteSpace: "nowrap",
+          overflow: "hidden",
+          textOverflow: "ellipsis",
+        }}
+      >
+        {row.source}
+      </TableCell>
+      <TableCell
+        sx={{
+          whiteSpace: "nowrap",
+          overflow: "hidden",
+          textOverflow: "ellipsis",
+        }}
+      >
+        {row.dest}
+      </TableCell>
+      <TableCell
+        sx={{
+          whiteSpace: "nowrap",
+          overflow: "hidden",
+          textOverflow: "ellipsis",
+        }}
+      >
+        {row.phoneNumber}
+      </TableCell>
+      <TableCell>{row.etaDays}</TableCell>
+      <TableCell>{row.distanceRemaining}</TableCell>
+      <TableCell>
+        <TripStatusButton type={row.currenStatus} />
+      </TableCell>
+      <TableCell>
+        <TATStatusButton type={TAT(row)} />
+      </TableCell>
+    </TableRow>
+  ))}
+</TableBody>
+
         </Table>
       </TableContainer>
 
@@ -422,6 +475,7 @@ const TripListTable2: React.FC<TripListTableProps> = ({ trips }) => {
           borderTop: "1px solid #E0E0E0",
           pt: "10px",
           pb: "24px",
+          paddingX: "24px"
         }}
       >
         <Box sx={{ display: "flex", alignItems: "center", gap: "8px" }}>
