@@ -1,8 +1,8 @@
 import React from "react";
 import { TableRow, TableCell, Checkbox } from "@mui/material";
-import TripStatusButton from "../buttons/TripStatusButton";
-import TATStatusButton from "../buttons/TATStatusButton";
-import { Trip } from "./GetData";
+import TripStatusButton from "../../buttons/TripStatusButton";
+import TATStatusButton from "../../buttons/TATStatusButton";
+import { Trip } from "../GetData";
 
 interface TableRowComponentProps {
   row: Trip;

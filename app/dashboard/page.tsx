@@ -1,6 +1,6 @@
 import React from 'react';
 import { Box } from '@mui/material';
-import TripListTable from '@/components/tripListTable/TripListTable';
+import TripListTable from '@/components/tripListTable/extra/TripListTable';
 import StatusNavBar from '@/components/statusNavbar/StatusNavbar';
 import { fetchTripsFromDB, Trip } from '@/components/tripListTable/GetData'; // Import your function
 

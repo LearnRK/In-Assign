@@ -58,7 +58,7 @@ const Dashboard = () => {
 
       {/* StatusNavBar should take its necessary height */}
       <Box sx={{ flexShrink: 0, mt: 2 }}>
-        <StatusCard />
+        <StatusCard trips={trips} />
       </Box>
 
       {/* Table component grows to fill the remaining space */}

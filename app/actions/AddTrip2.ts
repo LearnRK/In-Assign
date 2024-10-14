@@ -7,6 +7,7 @@ export const addTripToDatabase = async (tripData: {
     source: string;
     dest: string;
     phoneNumber: string;
+    etaDays: number;
 }) => {
     try {
         console.log("in addTripToDatabase");

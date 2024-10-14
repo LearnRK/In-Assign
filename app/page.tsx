@@ -177,12 +177,11 @@
 
 import React from 'react';
 import { Box } from '@mui/material';
-import TripListTable from '@/components/tripListTable/TripListTable';
-import StatusNavBar from '@/components/statusNavbar/StatusNavbar';
-import { fetchTripsFromDB, Trip } from '@/components/tripListTable/GetData';
+import { Trip } from '@/components/tripListTable/GetData';
 import Header from '@/components/header/header';
 import StatusCard from '@/components/statusNavbar/StatusCard';
 import TripListTable2 from '@/components/tripListTable/TripListTable2';
+import { fetchTripsFromDB } from './actions/GetData';
 
 const Dashboard = async () => {
   // Fetching trips data directly in the Server Component
@@ -204,7 +203,7 @@ const Dashboard = async () => {
       {/* StatusNavBar should take its necessary height */}
       <Box sx={{ flexShrink: 0, mt: 2 }}> 
         {/* <StatusNavBar /> */}
-        <StatusCard />
+        <StatusCard trips={trips} />
       </Box>
 
       {/* Table component grows to fill the remaining space */}
