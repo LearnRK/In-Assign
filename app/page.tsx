@@ -10,6 +10,7 @@ import { authOptions } from './api/auth/[...nextauth]/route';
 import Logout from '@/components/auth/Logout';
 import Login from '@/components/auth/Login';
 import Head from 'next/head'; // Import Head for setting the page title
+import TripListTable from '@/components/tripListTable/TripListTable';
 
 const Dashboard = async () => {
   console.log("In Dashboard component, starting to load...");
@@ -70,7 +71,8 @@ const Dashboard = async () => {
               marginLeft: "24px",
             }}
           >
-            <TripListTable2 trips={trips} />
+            <TripListTable trips={trips} />
+            {/* <TripListTable2 trips={trips} /> */}
           </Box>
         </Box>
       </>
