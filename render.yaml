@@ -28,12 +28,10 @@ services:
 
   - name: nextjs-app
     type: web
-    env: node
+    env: docker # Change from 'node' to 'docker' since you're using Dockerfile
     plan: starter
     autoDeploy: true
-    buildCommand: npm install && npm run build
-    startCommand: npm start
-    dockerfilePath: ./Dockerfile
+    dockerfilePath: ./Dockerfile # Ensure this is the correct path to your Dockerfile
     envVars:
       - key: DATABASE_URL
         value: postgresql://TripData_owner:cQtvPYd29xya@ep-solitary-sunset-a1alctl4.ap-southeast-1.aws.neon.tech/TripData?sslmode=require
