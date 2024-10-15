@@ -25,8 +25,9 @@ services:
       - key: KEYCLOAK_ADMIN_PASSWORD
         value: admin
     healthCheckPath: '/auth'
-    ports:
-      - 8080
+    containerPorts:
+      - port: 8080
+        protocol: TCP
 
   - name: nextjs-app
     type: web
@@ -35,7 +36,7 @@ services:
     autoDeploy: true
     buildCommand: npm install && npm run build
     startCommand: npm start
-    dockerfilePath: ./Dockerfile # Reference your Next.js Dockerfile
+    dockerfilePath: ./Dockerfile
     envVars:
       - key: DATABASE_URL
         value: postgresql://TripData_owner:cQtvPYd29xya@ep-solitary-sunset-a1alctl4.ap-southeast-1.aws.neon.tech/TripData?sslmode=require
@@ -53,6 +54,9 @@ services:
         value: http://localhost:8080/realms/develop
       - key: NEXT_PUBLIC_KEYCLOAK_CLIENT_ID
         value: frontend
+    containerPorts:
+      - port: 3000
+        protocol: TCP
 
 databases:
   - name: keycloak-db
