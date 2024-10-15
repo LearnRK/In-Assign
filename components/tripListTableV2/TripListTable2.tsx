@@ -6,12 +6,12 @@ import AddTripDialog from "../addTrip/AddTrip";
 import UpdateTripDialog from "../addTrip/UpdateTrip";
 import { addTripToDatabase } from "@/app/actions/AddTrip";
 import { updateTripToDatabase } from "@/app/actions/UpdateTrip";
-import { fetchTripsFromDB } from "@/app/actions/GetData"; // Assume fetchTripsFromDB fetches the updated trips
-import { deleteTripsFromDatabase } from "@/app/actions/DeleteTrip2"; // Assume DeleteTrip2 handles deleting trips
+import { fetchTripsFromDB } from "@/app/actions/GetData";
+import { deleteTripsFromDatabase } from "@/app/actions/DeleteTrip2";
 import TableBodyContainer from "../table/TableBodyContainer";
 import TablePagination from "../table/TablePagination";
 import { Trip, TripForm, UpdateTripForm } from "@/types/tripTypes";
-import TableHeader2 from "../table2/TableHeader2";
+import TableHeader2 from "../tableV2/TableHeader2";
 
 export interface TripListTableProps {
   trips: Trip[];
@@ -24,13 +24,12 @@ const TripListTable2: React.FC<TripListTableProps> = ({ trips }) => {
   const [selectAll, setSelectAll] = useState<boolean>(false);
   const [isAddDialogOpen, setIsAddDialogOpen] = useState<boolean>(false);
   const [isUpdateDialogOpen, setIsUpdateDialogOpen] = useState<boolean>(false);
-  const [tripData, setTripData] = useState<Trip[]>(() => [...trips]); // Initialize trip data properly
+  const [tripData, setTripData] = useState<Trip[]>(() => [...trips]);
   const [selectedTrips, setSelectedTrips] = useState<Trip[]>([]);
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc');
   const [sortColumn, setSortColumn] = useState<keyof Trip | 'tripStatus' | 'tatStatus'>('tripStatus');
 
   const [snackbarOpen, setSnackbarOpen] = useState<boolean>(false);
-  const [deletedCount, setDeletedCount] = useState<number>(0);
 
   const [snackbarMessage, setSnackbarMessage] = useState<string>("");
   const [snackbarSeverity, setSnackbarSeverity] = useState<"success" | "error">("success");
@@ -145,16 +144,14 @@ const TripListTable2: React.FC<TripListTableProps> = ({ trips }) => {
   
     try {
       await addTripToDatabase(newTrip);
-      // Show success snackbar
       setSnackbarMessage("Trip added successfully!");
       setSnackbarSeverity("success");
     } catch (error) {
       console.error("Failed to add trip to database:", error);
-      // Show error snackbar
       setSnackbarMessage("Failed to add trip!");
       setSnackbarSeverity("error");
     }
-    setSnackbarOpen(true); // Open the snackbar
+    setSnackbarOpen(true);
   };
   
   const handleUpdateTrip = async (formState: UpdateTripForm[]) => {
@@ -183,34 +180,31 @@ const TripListTable2: React.FC<TripListTableProps> = ({ trips }) => {
       setIsUpdateDialogOpen(false);
       setSelectedTrips([]);
   
-      // Trigger success snackbar when the trip is successfully updated
       setSnackbarMessage("Trip updated successfully!");
       setSnackbarSeverity("success");
     } catch (error) {
       console.error("Failed to update trip in the database:", error);
-      // Trigger error snackbar if update fails
       setSnackbarMessage("Failed to update trip!");
       setSnackbarSeverity("error");
     }
-    setSnackbarOpen(true); // Open the snackbar
+    setSnackbarOpen(true); 
   };
   
   
   const handleDeleteTrips = async () => {
     if (selectedRows.length > 0) {
       try {
-        await deleteTripsFromDatabase(selectedRows); // Delete selected trips from database
-        setDeletedCount(selectedRows.length); // Set the count of deleted trips
-        setSnackbarMessage(`${selectedRows.length} trip(s) deleted successfully!`); // Set success message for delete
-        setSnackbarSeverity("success"); // Set severity for success
-        setSnackbarOpen(true); // Open Snackbar after deletion
-        await refetchTrips(); // Refetch updated trips after deletion
-        setSelectedRows([]); // Clear selection after deletion
+        await deleteTripsFromDatabase(selectedRows);
+        setSnackbarMessage(`${selectedRows.length} trip(s) deleted successfully!`); 
+        setSnackbarSeverity("success");
+        setSnackbarOpen(true); 
+        await refetchTrips();
+        setSelectedRows([]);
       } catch (error) {
         console.error("Error deleting selected trips:", error);
-        setSnackbarMessage("Failed to delete trips!"); // Set error message
-        setSnackbarSeverity("error"); // Set severity for error
-        setSnackbarOpen(true); // Open the snackbar for error
+        setSnackbarMessage("Failed to delete trips!");
+        setSnackbarSeverity("error");
+        setSnackbarOpen(true);
       }
     }
   };
@@ -255,7 +249,7 @@ const TripListTable2: React.FC<TripListTableProps> = ({ trips }) => {
         selectedRows={selectedRows}
         openAddDialog={openAddDialog}
         openUpdateDialog={openUpdateDialog}
-        onTripsDeleted={handleDeleteTrips} // Delete trips and handle data refresh
+        onTripsDeleted={handleDeleteTrips}
       />
 
       <TableContainer sx={{ flexGrow: 1, maxHeight: "calc(100vh - 360px)", overflowY: "auto" }}>

@@ -1,17 +1,37 @@
 import { NextRequest, NextResponse } from 'next/server';
-import client from "@/extra/db/index"
+import client from "@/prisma/singleton";
+
+interface TripData {
+    tripId: string;
+    transporter: string;
+    tripStartTime: string;
+    currentStatusCode: string;
+    currenStatus: string;
+    phoneNumber: bigint;
+    etaDays: number;
+    distanceRemaining: number;
+    tripEndTime: string;
+    source: string;
+    sourceLatitude: number;
+    sourceLongitude: number;
+    dest: string;
+    destLatitude: number;
+    destLongitude: number;
+    lastPingTime: string;
+    createdAt: string;
+}
 
 export async function POST(req: NextRequest) {
     const body = await req.json();
 
     try {
-        const trips = body.data.map((trip: any) => ({
+        const trips: TripData[] = body.data.map((trip: Partial<TripData>) => ({
             tripId: trip.tripId || "",
             transporter: trip.transporter || "",
             tripStartTime: trip.tripStartTime || "",
             currentStatusCode: trip.currentStatusCode || "",
             currenStatus: trip.currenStatus || "",
-            phoneNumber: BigInt(trip.phoneNumber), // Use BigInt here, but convert later for response
+            phoneNumber: BigInt(trip.phoneNumber || "0"),
             etaDays: trip.etaDays || 0,
             distanceRemaining: trip.distanceRemaining || 0,
             tripEndTime: trip.tripEndTime || "",
@@ -25,31 +45,23 @@ export async function POST(req: NextRequest) {
             createdAt: trip.createdAt || ""
         }));
 
-        const createdTrips = await Promise.all(trips.map(async (trip: any) => {
-            return client.trip.create({ data: trip });
-        }));
+        const createdTrips = await Promise.all(
+            trips.map(async (trip) => client.trip.create({ data: trip }))
+        );
 
-        // Convert BigInt values to strings in the response to avoid serialization issues
+        // Convert BigInt values to strings for JSON serialization
         const sanitizedTrips = createdTrips.map(trip => ({
             ...trip,
-            phoneNumber: trip.phoneNumber.toString() // Convert BigInt to string for the response
+            phoneNumber: trip.phoneNumber.toString() // BigInt to string for response
         }));
 
-        return NextResponse.json({
-            trips: sanitizedTrips
-        });
+        return NextResponse.json({ trips: sanitizedTrips });
     } catch (e) {
-        console.log(e);
-        return NextResponse.json({
-            message: "Error while creating trips"
-        }, {
-            status: 500
-        });
+        console.error(e);
+        return NextResponse.json({ message: "Error while creating trips" }, { status: 500 });
     }
 }
 
-export async function GET(req: NextRequest) {
-    return NextResponse.json({
-        message: "connected to get"
-    });
+export async function GET() {
+    return NextResponse.json({ message: "connected to get" });
 }

@@ -1,0 +1,65 @@
+services:
+  - name: keycloak-service
+    type: web
+    env: docker
+    plan: starter
+    autoDeploy: true
+    dockerfilePath: ./Dockerfile.keycloak
+    envVars:
+      - key: KC_DB
+        value: postgres
+      - key: KC_DB_URL_HOST
+        value: ep-solitary-sunset-a1alctl4.ap-southeast-1.aws.neon.tech
+      - key: KC_DB_URL_PORT
+        value: '5432'
+      - key: KC_DB_URL_DATABASE
+        value: TripData
+      - key: KC_DB_USERNAME
+        value: TripData_owner
+      - key: KC_DB_PASSWORD
+        value: cQtvPYd29xya
+      - key: KC_DB_URL_PARAMETERS
+        value: sslmode=require
+      - key: KEYCLOAK_ADMIN
+        value: admin
+      - key: KEYCLOAK_ADMIN_PASSWORD
+        value: admin
+    healthCheckPath: '/auth'
+    ports:
+      - 8080
+
+  - name: nextjs-app
+    type: web
+    env: node
+    plan: starter
+    autoDeploy: true
+    buildCommand: npm install && npm run build
+    startCommand: npm start
+    dockerfilePath: ./Dockerfile # Reference your Next.js Dockerfile
+    envVars:
+      - key: DATABASE_URL
+        value: postgresql://TripData_owner:cQtvPYd29xya@ep-solitary-sunset-a1alctl4.ap-southeast-1.aws.neon.tech/TripData?sslmode=require
+      - key: NEXTAUTH_URL
+        value: http://localhost:3000
+      - key: NEXTAUTH_SECRET
+        value: mysupersecret
+      - key: KEYCLOAK_CLIENT_ID
+        value: frontend
+      - key: KEYCLOAK_CLIENT_SECRET
+        value: 73DBfGHeOyKfy5EVP2jgS7VZ7F9SygYw
+      - key: KEYCLOAK_ISSUER
+        value: http://localhost:8080/realms/develop
+      - key: NEXT_PUBLIC_KEYCLOAK_ISSUER
+        value: http://localhost:8080/realms/develop
+      - key: NEXT_PUBLIC_KEYCLOAK_CLIENT_ID
+        value: frontend
+
+databases:
+  - name: keycloak-db
+    plan: starter
+    region: oregon
+    type: postgres
+    password: cQtvPYd29xya
+    user: TripData_owner
+    database: TripData
+    autoDeploy: true

@@ -1,5 +1,5 @@
 import React from 'react';
-import { AppBar, Toolbar, Typography, Button, Box } from '@mui/material';
+import { AppBar, Toolbar, Box } from '@mui/material';
 import Image from 'next/image'; // Assuming you're using Next.js Image component for the logo
 import Logout from '../auth/Logout';
 

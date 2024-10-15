@@ -138,16 +138,14 @@ const TripListTable: React.FC<TripListTableProps> = ({ trips }) => {
   
     try {
       await addTripToDatabase(newTrip);
-      // Show success snackbar
       setSnackbarMessage("Trip added successfully!");
       setSnackbarSeverity("success");
     } catch (error) {
       console.error("Failed to add trip to database:", error);
-      // Show error snackbar
       setSnackbarMessage("Failed to add trip!");
       setSnackbarSeverity("error");
     }
-    setSnackbarOpen(true); // Open the snackbar
+    setSnackbarOpen(true); 
   };
   
   const handleUpdateTrip = async (formState: UpdateTripForm[]) => {
@@ -176,16 +174,14 @@ const TripListTable: React.FC<TripListTableProps> = ({ trips }) => {
       setIsUpdateDialogOpen(false);
       setSelectedTrips([]);
   
-      // Trigger success snackbar when the trip is successfully updated
       setSnackbarMessage("Trip updated successfully!");
       setSnackbarSeverity("success");
     } catch (error) {
       console.error("Failed to update trip in the database:", error);
-      // Trigger error snackbar if update fails
       setSnackbarMessage("Failed to update trip!");
       setSnackbarSeverity("error");
     }
-    setSnackbarOpen(true); // Open the snackbar
+    setSnackbarOpen(true);
   };
 
   const openUpdateDialog = () => {
@@ -260,8 +256,8 @@ const TripListTable: React.FC<TripListTableProps> = ({ trips }) => {
           tripId: trip.tripId,
           transporter: trip.transporter,
           source: trip.source,
-          destination: trip.dest,   // Mapping 'dest' to 'destination'
-          phone: trip.phoneNumber,  // Mapping 'phoneNumber' to 'phone'
+          destination: trip.dest, 
+          phone: trip.phoneNumber, 
         }))}
       />
 

@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { Button, Snackbar, Alert } from '@mui/material';
+import React from 'react';
+import { Button} from '@mui/material';
 import { deleteTripsFromDatabase } from '@/app/actions/DeleteTrip2';
 
 interface DeleteTripHandlerProps {

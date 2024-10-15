@@ -5,11 +5,10 @@ export const deleteTripsFromDatabase = async (tripIds: string[]) => {
     try {
         console.log("In deleteTripsFromDatabase");
 
-        // Using Prisma to delete multiple trips at once with the `deleteMany` method
         await client.trip.deleteMany({
             where: {
                 tripId: {
-                    in: tripIds, // This will delete all trips whose `tripId` is in the array
+                    in: tripIds,
                 },
             },
         });

@@ -9,7 +9,7 @@ export interface Trip {
     tripStartTime: string;
     currentStatusCode: string;
     currenStatus: string;
-    phoneNumber: string; // We'll serialize BigInt to string for JSON purposes
+    phoneNumber: string;
     etaDays: number;
     distanceRemaining: number;
     tripEndTime: string;
@@ -23,15 +23,13 @@ export interface Trip {
     createdAt: string;
 }
 
-// Server-side fetching action for trips
 export const fetchTripsFromDB = async (): Promise<Trip[]> => {
     try {
         const tripData = await client.trip.findMany();
 
-        // Convert the BigInt phoneNumber to string to handle JSON serialization issues
         const sanitizedData: Trip[] = tripData.map(trip => ({
             ...trip,
-            phoneNumber: trip.phoneNumber.toString(), // BigInt to string
+            phoneNumber: trip.phoneNumber.toString(),
         }));
 
         return sanitizedData;

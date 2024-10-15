@@ -1,13 +1,13 @@
 import React from 'react';
 import { Box } from '@mui/material';
-import { Trip } from '@/extra/extra/GetData';
 import Header from '@/components/header/header';
 import StatusCard from '@/components/statusCard/StatusCard';
 import { fetchTripsFromDB } from '../actions/GetData';
 import { getServerSession } from 'next-auth';
-import { authOptions } from '../api/auth/[...nextauth]/route';
 import Login from '@/components/auth/Login';
-import TripListTable2 from '@/components/tripListTable2/TripListTable2';
+import TripListTable2 from '@/components/tripListTableV2/TripListTable2';
+import { authOptions } from '../utils/authOptions';
+import { Trip } from '@/types/tripTypes';
 
 const Dashboard = async () => {
   console.log("In Dashboard component, starting to load...");
