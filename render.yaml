@@ -51,13 +51,3 @@ services:
         value: http://localhost:8080/realms/develop
       - key: NEXT_PUBLIC_KEYCLOAK_CLIENT_ID
         value: frontend
-
-databases:
-  - name: keycloak-db
-    plan: starter
-    region: oregon
-    type: postgres
-    password: cQtvPYd29xya
-    user: TripData_owner
-    database: TripData
-    autoDeploy: true
