@@ -1,6 +1,6 @@
 "use server";
 
-import client from "@/extra/db/index";
+import client from "@/prisma/singleton";
 
 export interface Trip {
     id: string;

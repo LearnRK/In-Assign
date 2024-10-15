@@ -1,5 +1,6 @@
 "use server"
-import prisma from "@/lib/23/prisma";
+import client from "@/prisma/singleton";
+
 
 export const addTripToDatabase = async (tripData: {
     tripId: string;
@@ -11,7 +12,7 @@ export const addTripToDatabase = async (tripData: {
 }) => {
     try {
         console.log("in addTripToDatabase");
-        await prisma.trip.create({
+        await client.trip.create({
             data: {
                 tripId: tripData.tripId,
                 transporter: tripData.transporter,

@@ -1,34 +1,83 @@
-// components/table/TableHeader.tsx
 import React from 'react';
-import { TableRow, TableCell, Checkbox } from '@mui/material';
+import { Box, Typography, Button } from '@mui/material';
 
 interface TableHeaderProps {
-  selectAll: boolean;
-  onSelectAll: () => void;
-  handleColumnClick: (column: string) => void;
-}
+    selectedRows: string[]; // Pass selectedRows as a prop
+    openUpdateDialog: () => void; // Correct the function prop types
+    openAddDialog: () => void;     // Correct the function prop types
+  }
+  
+  const TableHeader: React.FC<TableHeaderProps> = ({ selectedRows, openUpdateDialog, openAddDialog }) => {
+    return (
+      <Box
+        sx={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          padding: "8px 20px",
+          width: "100%",
+          background: "#FFFFFF",
+          borderBottom: "1px solid #F2F2F2",
+          boxSizing: "border-box",
+        }}
+      >
+        <Typography
+          sx={{
+            fontFamily: "'Poppins', sans-serif",
+            fontWeight: 600,
+            fontSize: "16px",
+            lineHeight: "24px",
+            color: "#1A1A1A",
+          }}
+        >
+          Trip list
+        </Typography>
+  
+        <Box sx={{ display: "flex", gap: "8px" }}>
+          {selectedRows.length >= 1 && (
+            <Button
+              variant="outlined"
+              sx={{
+                width: "96px",
+                height: "32px",
+                background: "#FFFFFF",
+                border: "1px solid #0057D1",
+                borderRadius: "4px",
+                fontFamily: "'Poppins', sans-serif",
+                fontWeight: 500,
+                fontSize: "11px",
+                lineHeight: "16px",
+                color: "#0057D1",
+                textTransform: "none",
+                padding: "8px",
+              }}
+              onClick={openUpdateDialog} // Correct: Don't invoke the function, just pass it
+            >
+              Update status
+            </Button>
+          )}
+          <Button
+            variant="contained"
+            sx={{
+              width: "96px",
+              height: "32px",
+              background: "#0057D1",
+              borderRadius: "4px",
+              fontFamily: "Poppins, sans-serif",
+              fontWeight: 500,
+              fontSize: "11px",
+              lineHeight: "16px",
+              color: "#FFFFFF",
+              textTransform: "none",
+              padding: "8px",
+            }}
+            onClick={openAddDialog} // Correct: Don't invoke the function, just pass it
+          >
+            Add Trip
+          </Button>
+        </Box>
+      </Box>
+    );
+  };
 
-const TableHeader: React.FC<TableHeaderProps> = ({ selectAll, onSelectAll, handleColumnClick }) => {
-  return (
-    <TableRow sx={{ backgroundColor: "#F1F3F4" }}>
-      <TableCell padding="checkbox" sx={{ minWidth: 40 }}>
-        <Checkbox
-          color="primary"
-          checked={selectAll}
-          onChange={onSelectAll}
-        />
-      </TableCell>
-      <TableCell onClick={() => handleColumnClick('tripId')} sx={{ cursor: 'pointer', fontWeight: 'bold' }}>Trip id</TableCell>
-      <TableCell onClick={() => handleColumnClick('transporter')} sx={{ cursor: 'pointer', fontWeight: 'bold' }}>Transporter</TableCell>
-      <TableCell onClick={() => handleColumnClick('source')} sx={{ cursor: 'pointer', fontWeight: 'bold' }}>Source</TableCell>
-      <TableCell onClick={() => handleColumnClick('dest')} sx={{ cursor: 'pointer', fontWeight: 'bold' }}>Destination</TableCell>
-      <TableCell onClick={() => handleColumnClick('phoneNumber')} sx={{ cursor: 'pointer', fontWeight: 'bold' }}>Phone</TableCell>
-      <TableCell onClick={() => handleColumnClick('etaDays')} sx={{ cursor: 'pointer', fontWeight: 'bold' }}>ETA</TableCell>
-      <TableCell onClick={() => handleColumnClick('distanceRemaining')} sx={{ cursor: 'pointer', fontWeight: 'bold' }}>Distance remaining</TableCell>
-      <TableCell onClick={() => handleColumnClick('tripStatus')} sx={{ cursor: 'pointer', fontWeight: 'bold' }}>Trip status</TableCell>
-      <TableCell onClick={() => handleColumnClick('tatStatus')} sx={{ cursor: 'pointer', fontWeight: 'bold' }}>TAT status</TableCell>
-    </TableRow>
-  );
-};
-
-export default TableHeader;
+  export default TableHeader;

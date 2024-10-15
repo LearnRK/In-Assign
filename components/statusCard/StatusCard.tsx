@@ -92,7 +92,7 @@ const StatusCard: React.FC<TripListTableProps> = ({ trips }) => {
       <Paper
         elevation={0}
         sx={{
-          flexGrow: 4, // Relative size 4
+          flexGrow: 5, // Relative size 4
           display: 'flex',
           flexDirection: 'row',
           alignItems: 'flex-start',
@@ -133,7 +133,7 @@ const StatusCard: React.FC<TripListTableProps> = ({ trips }) => {
       <Paper
         elevation={0}
         sx={{
-          flexGrow: 5,
+          flexGrow: 4,
           display: 'flex',
           flexDirection: 'row',
           alignItems: 'flex-start',
@@ -267,7 +267,7 @@ const StatusCard: React.FC<TripListTableProps> = ({ trips }) => {
       <Paper
         elevation={0}
         sx={{
-          flexGrow: 7,
+          flexGrow: 12,
           display: 'flex',
           flexDirection: 'row',
           alignItems: 'center',

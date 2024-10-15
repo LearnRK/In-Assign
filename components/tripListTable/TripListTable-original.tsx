@@ -65,7 +65,7 @@ interface TripListTableProps {
   trips: Trip[];
 }
 
-const TripListTable2: React.FC<TripListTableProps> = ({ trips }) => {
+const TripListTableOriginal: React.FC<TripListTableProps> = ({ trips }) => {
   const [page, setPage] = useState<number>(1);
   const [rowsPerPage, setRowsPerPage] = useState<number>(10);
   const [selectedRows, setSelectedRows] = useState<string[]>([]);
@@ -551,6 +551,13 @@ const TripListTable2: React.FC<TripListTableProps> = ({ trips }) => {
         open={isAddDialogOpen}
         onClose={() => setIsAddDialogOpen(false)}
         onSubmit={handleAddTrip}
+        existingTrips={tripData.map((trip) => ({
+          tripId: trip.tripId,
+          transporter: trip.transporter,
+          source: trip.source,
+          destination: trip.dest,   // Mapping 'dest' to 'destination'
+          phone: trip.phoneNumber,  // Mapping 'phoneNumber' to 'phone'
+        }))}
       />
 
       {selectedTrips.length > 0 && (
@@ -565,4 +572,4 @@ const TripListTable2: React.FC<TripListTableProps> = ({ trips }) => {
   );
 };
 
-export default TripListTable2;
+export default TripListTableOriginal;

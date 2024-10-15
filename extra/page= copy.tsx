@@ -180,7 +180,7 @@ import { Box } from '@mui/material';
 import { Trip } from '@/extra/extra/GetData';
 import Header from '@/components/header/header';
 import StatusCard from '@/components/statusCard/StatusCard';
-import TripListTable2 from '@/components/tripListTable/TripListTable2';
+import TripListTable2 from '@/components/tripListTable/TripListTable-original';
 import { fetchTripsFromDB } from '../app/actions/GetData';
 
 import { getServerSession } from 'next-auth'

@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState, useContext } from 'react';
 import { Box } from '@mui/material';
-import TripListTable2 from '@/components/tripListTable/TripListTable2';
+import TripListTable2 from '@/components/tripListTable/TripListTable-original';
 import Header from '@/components/header/header';
 import StatusCard from '@/components/statusCard/StatusCard';
 import { AuthContext } from '@/extra/context/AuthContext'; // Import AuthContext

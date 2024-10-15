@@ -1,5 +1,6 @@
 "use server";
-import prisma from "@/lib/23/prisma";
+import client from "@/prisma/singleton";
+
 
 export const updateTripToDatabase = async (tripId: string, updatedData: {
     transporter?: string;
@@ -7,7 +8,7 @@ export const updateTripToDatabase = async (tripId: string, updatedData: {
 }) => {
     try {
         console.log("in updateTripToDatabase");
-        await prisma.trip.update({
+        await client.trip.update({
             where: {
                 tripId: tripId,
             },

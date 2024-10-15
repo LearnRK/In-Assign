@@ -6,30 +6,35 @@ import AddTripDialog from "../addTrip/AddTrip";
 import UpdateTripDialog from "../addTrip/UpdateTrip";
 import { addTripToDatabase } from "@/app/actions/AddTrip";
 import { updateTripToDatabase } from "@/app/actions/UpdateTrip";
+import { fetchTripsFromDB } from "@/app/actions/GetData"; // Assume fetchTripsFromDB fetches the updated trips
+import { deleteTripsFromDatabase } from "@/app/actions/DeleteTrip2"; // Assume DeleteTrip2 handles deleting trips
 import TableBodyContainer from "../table/TableBodyContainer";
-import TableHeader from "../table/TableHeader";
 import TablePagination from "../table/TablePagination";
 import { Trip, TripForm, UpdateTripForm } from "@/types/tripTypes";
+import TableHeader2 from "../table2/TableHeader2";
 
 export interface TripListTableProps {
   trips: Trip[];
 }
 
-const TripListTable: React.FC<TripListTableProps> = ({ trips }) => {
+const TripListTable2: React.FC<TripListTableProps> = ({ trips }) => {
   const [page, setPage] = useState<number>(1);
   const [rowsPerPage, setRowsPerPage] = useState<number>(10);
   const [selectedRows, setSelectedRows] = useState<string[]>([]);
   const [selectAll, setSelectAll] = useState<boolean>(false);
   const [isAddDialogOpen, setIsAddDialogOpen] = useState<boolean>(false);
   const [isUpdateDialogOpen, setIsUpdateDialogOpen] = useState<boolean>(false);
-  const [tripData, setTripData] = useState<Trip[]>(trips);
+  const [tripData, setTripData] = useState<Trip[]>(() => [...trips]); // Initialize trip data properly
   const [selectedTrips, setSelectedTrips] = useState<Trip[]>([]);
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc');
   const [sortColumn, setSortColumn] = useState<keyof Trip | 'tripStatus' | 'tatStatus'>('tripStatus');
 
   const [snackbarOpen, setSnackbarOpen] = useState<boolean>(false);
+  const [deletedCount, setDeletedCount] = useState<number>(0);
+
   const [snackbarMessage, setSnackbarMessage] = useState<string>("");
   const [snackbarSeverity, setSnackbarSeverity] = useState<"success" | "error">("success");
+
 
   const totalRecords = tripData.length;
   const totalPages = Math.ceil(totalRecords / rowsPerPage);
@@ -65,35 +70,29 @@ const TripListTable: React.FC<TripListTableProps> = ({ trips }) => {
     return etaDays >= actualTripDays ? "On Time" : "Delayed";
   };
 
-  // Custom sorting logic for Trip Status and TAT Status
-  const currentData = tripData
+  const currentData = [...tripData] // Create shallow copy before sorting
     .sort((a, b) => {
-      const order = sortDirection === 'asc' ? 1 : -1;
+      const order = sortDirection === "asc" ? 1 : -1;
 
-      // Sort by trip status
-      if (sortColumn === 'tripStatus') {
-        const statusOrder = ['Delivered', 'In Transit', 'Booked']; // Example order
+      if (sortColumn === "tripStatus") {
+        const statusOrder = ["Delivered", "In Transit", "Booked"];
         return order * (statusOrder.indexOf(a.currenStatus) - statusOrder.indexOf(b.currenStatus));
       }
 
-      // Sort by TAT status
-      if (sortColumn === 'tatStatus') {
+      if (sortColumn === "tatStatus") {
         const tatA = TAT(a);
         const tatB = TAT(b);
-        const tatOrder = ['On Time', 'Other', 'Delayed']; // Sort "On Time" first
+        const tatOrder = ["On Time", "Other", "Delayed"];
         return order * (tatOrder.indexOf(tatA) - tatOrder.indexOf(tatB));
       }
 
-      // Default sorting for other columns
       return a[sortColumn] > b[sortColumn] ? order : -order;
     })
     .slice((page - 1) * rowsPerPage, page * rowsPerPage);
 
   const handleRowSelect = (tripId: string) => {
-    setSelectedRows((prevSelected) => 
-      prevSelected.includes(tripId) 
-        ? prevSelected.filter((id) => id !== tripId) 
-        : [...prevSelected, tripId]
+    setSelectedRows((prevSelected) =>
+      prevSelected.includes(tripId) ? prevSelected.filter((id) => id !== tripId) : [...prevSelected, tripId]
     );
   };
 
@@ -110,7 +109,15 @@ const TripListTable: React.FC<TripListTableProps> = ({ trips }) => {
     setSelectedTrips(tripData.filter((trip) => selectedRows.includes(trip.tripId)));
   }, [selectedRows, tripData]);
 
-  // Handle Add Trip
+  const refetchTrips = async () => {
+    try {
+      const fetchedTrips = await fetchTripsFromDB(); // Fetch updated trips from the backend
+      setTripData(fetchedTrips);
+    } catch (error) {
+      console.error("Failed to refetch trips:", error);
+    }
+  };
+
   const handleAddTrip = async (formState: TripForm) => {
     const newTrip: Trip = {
       id: crypto.randomUUID(),
@@ -187,6 +194,27 @@ const TripListTable: React.FC<TripListTableProps> = ({ trips }) => {
     }
     setSnackbarOpen(true); // Open the snackbar
   };
+  
+  
+  const handleDeleteTrips = async () => {
+    if (selectedRows.length > 0) {
+      try {
+        await deleteTripsFromDatabase(selectedRows); // Delete selected trips from database
+        setDeletedCount(selectedRows.length); // Set the count of deleted trips
+        setSnackbarMessage(`${selectedRows.length} trip(s) deleted successfully!`); // Set success message for delete
+        setSnackbarSeverity("success"); // Set severity for success
+        setSnackbarOpen(true); // Open Snackbar after deletion
+        await refetchTrips(); // Refetch updated trips after deletion
+        setSelectedRows([]); // Clear selection after deletion
+      } catch (error) {
+        console.error("Error deleting selected trips:", error);
+        setSnackbarMessage("Failed to delete trips!"); // Set error message
+        setSnackbarSeverity("error"); // Set severity for error
+        setSnackbarOpen(true); // Open the snackbar for error
+      }
+    }
+  };
+  
 
   const openUpdateDialog = () => {
     setIsUpdateDialogOpen(true);
@@ -196,12 +224,12 @@ const TripListTable: React.FC<TripListTableProps> = ({ trips }) => {
     setIsAddDialogOpen(true);
   };
 
-  const handleColumnClick = (column: keyof Trip | 'tripStatus' | 'tatStatus') => {
+  const handleColumnClick = (column: keyof Trip | "tripStatus" | "tatStatus") => {
     if (sortColumn === column) {
-      setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc');
+      setSortDirection(sortDirection === "asc" ? "desc" : "asc");
     } else {
       setSortColumn(column);
-      setSortDirection('asc');
+      setSortDirection("asc");
     }
   };
 
@@ -218,17 +246,17 @@ const TripListTable: React.FC<TripListTableProps> = ({ trips }) => {
         flexDirection: "column",
         alignItems: "flex-start",
         width: "calc(100%)",
-        height: "calc(100vh - 48px)",
+        height: "calc(100vh)",
         backgroundColor: "#FFFFFF",
         overflow: "hidden",
       }}
     >
-      <TableHeader
+      <TableHeader2
         selectedRows={selectedRows}
         openAddDialog={openAddDialog}
         openUpdateDialog={openUpdateDialog}
+        onTripsDeleted={handleDeleteTrips} // Delete trips and handle data refresh
       />
-
 
       <TableContainer sx={{ flexGrow: 1, maxHeight: "calc(100vh - 360px)", overflowY: "auto" }}>
         <TableBodyContainer
@@ -242,7 +270,6 @@ const TripListTable: React.FC<TripListTableProps> = ({ trips }) => {
         />
       </TableContainer>
 
-      
       <TablePagination
         page={page}
         rowsPerPage={rowsPerPage}
@@ -252,6 +279,7 @@ const TripListTable: React.FC<TripListTableProps> = ({ trips }) => {
         handleRowsPerPageChange={handleRowsPerPageChange}
       />
 
+      {/* Pass existingTrips to AddTripDialog */}
       <AddTripDialog
         open={isAddDialogOpen}
         onClose={() => setIsAddDialogOpen(false)}
@@ -260,8 +288,8 @@ const TripListTable: React.FC<TripListTableProps> = ({ trips }) => {
           tripId: trip.tripId,
           transporter: trip.transporter,
           source: trip.source,
-          destination: trip.dest,   // Mapping 'dest' to 'destination'
-          phone: trip.phoneNumber,  // Mapping 'phoneNumber' to 'phone'
+          destination: trip.dest,
+          phone: trip.phoneNumber,
         }))}
       />
 
@@ -274,6 +302,7 @@ const TripListTable: React.FC<TripListTableProps> = ({ trips }) => {
         />
       )}
 
+      {/* Snackbar for showing success/failure messages */}
       <Snackbar
         open={snackbarOpen}
         autoHideDuration={3000}
@@ -284,8 +313,10 @@ const TripListTable: React.FC<TripListTableProps> = ({ trips }) => {
           {snackbarMessage}
         </Alert>
       </Snackbar>
+
     </Paper>
   );
 };
 
-export default TripListTable;
+export default TripListTable2;
+  

@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import {
   Dialog,
@@ -16,6 +15,7 @@ import {
 import CloseIcon from "@mui/icons-material/Close";
 import { SelectChangeEvent } from "@mui/material";
 
+// Adjust InputBox component to accept the error prop
 const InputBox: React.FC<{
   label: string;
   value: string;
@@ -23,7 +23,8 @@ const InputBox: React.FC<{
   placeholder: string;
   onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   width?: string;
-}> = ({ label, value, name, placeholder, onChange, width = "100%" }) => (
+  error?: string; // The error message to display
+}> = ({ label, value, name, placeholder, onChange, width = "100%", error }) => (
   <FormControl fullWidth margin="dense">
     <Typography
       component="label"
@@ -55,6 +56,11 @@ const InputBox: React.FC<{
         borderRadius: "4px",
       }}
     />
+    {error && (
+      <Typography color="error" variant="caption">
+        {error}
+      </Typography>
+    )}
   </FormControl>
 );
 
@@ -69,10 +75,16 @@ interface TripForm {
 interface AddTripDialogProps {
   open: boolean;
   onClose: () => void;
-  onSubmit: (formState: TripForm) => Promise<void>; // Change to return Promise
+  onSubmit: (formState: TripForm) => Promise<void>;
+  existingTrips: TripForm[]; // Array of existing trips to check against
 }
 
-const AddTripDialog: React.FC<AddTripDialogProps> = ({ open, onClose, onSubmit }) => {
+const AddTripDialog: React.FC<AddTripDialogProps> = ({
+  open,
+  onClose,
+  onSubmit,
+  existingTrips,
+}) => {
   const [formState, setFormState] = useState<TripForm>({
     tripId: '',
     transporter: '',
@@ -82,11 +94,22 @@ const AddTripDialog: React.FC<AddTripDialogProps> = ({ open, onClose, onSubmit }
   });
 
   const [isFormValid, setIsFormValid] = useState<boolean>(false);
+  const [tripIdError, setTripIdError] = useState<string | undefined>(undefined); // Handle undefined error
+  const [phoneError, setPhoneError] = useState<string | undefined>(undefined); // Handle phone error
 
   useEffect(() => {
     const { tripId, transporter, source, destination, phone } = formState;
-    setIsFormValid(!!(tripId && transporter && source && destination && phone));
-  }, [formState]);
+    
+    // Check if Trip ID already exists
+    if (existingTrips.some((trip) => trip.tripId === tripId)) {
+      setTripIdError('Trip ID already exists, please use a unique ID');
+    } else {
+      setTripIdError(undefined); // Reset error if ID is unique
+    }
+
+    // Form validation (excluding phone number for now)
+    setIsFormValid(!!(tripId && transporter && source && destination && !tripIdError));
+  }, [formState, existingTrips, tripIdError]);
 
   const handleTextFieldChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -99,8 +122,15 @@ const AddTripDialog: React.FC<AddTripDialogProps> = ({ open, onClose, onSubmit }
   };
 
   const handleSubmit = async () => {
-    await onSubmit(formState); // Ensure this is awaited
-    onClose();
+    // Validate phone number only at submission time
+    const phoneRegex = /^\d{10}$/;
+    if (!phoneRegex.test(formState.phone)) {
+      setPhoneError('Phone number must be a 10-digit number');
+    } else {
+      setPhoneError(undefined); // Reset phone error if valid
+      await onSubmit(formState); // Submit form only if phone is valid
+      onClose();
+    }
   };
 
   return (
@@ -157,6 +187,7 @@ const AddTripDialog: React.FC<AddTripDialogProps> = ({ open, onClose, onSubmit }
             name="tripId"
             onChange={handleTextFieldChange}
             placeholder="Enter Trip ID"
+            error={tripIdError} // Pass error state to InputBox
           />
 
           <FormControl fullWidth margin="dense">
@@ -228,6 +259,7 @@ const AddTripDialog: React.FC<AddTripDialogProps> = ({ open, onClose, onSubmit }
           name="phone"
           onChange={handleTextFieldChange}
           placeholder="Enter Phone Number"
+          error={phoneError} // Display phone error message if validation fails
         />
       </DialogContent>
 
@@ -255,11 +287,11 @@ const AddTripDialog: React.FC<AddTripDialogProps> = ({ open, onClose, onSubmit }
         <Button
           onClick={handleSubmit}
           variant="contained"
-          disabled={!isFormValid}
+          disabled={!isFormValid || !!tripIdError} // Disable button if form is invalid or trip ID has error
           sx={{
             width: '120px',
             height: '32px',
-            background: isFormValid ? '#0057D1' : '#C7C7C7',
+            background: isFormValid && !tripIdError ? '#0057D1' : '#C7C7C7',
             borderRadius: '4px',
             color: '#FFFFFF',
             textTransform: 'none',
